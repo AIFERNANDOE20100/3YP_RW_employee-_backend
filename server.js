@@ -16,7 +16,7 @@ app.post("/api/keypress", (req, res) => {
   console.log(`Key pressed: ${key}`);
 
   // Publish to AWS IoT Core
-  publishToIoT("your/topic", { key });
+  publishToIoT("/3YP/batch2025/device1", { key });
 
   res.json({ status: "success", keyReceived: key });
 });
