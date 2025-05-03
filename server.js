@@ -11,20 +11,20 @@ admin.initializeApp({
 });
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// Import and use routes
+// Routes
 const keyPressRouter = require("./routes/keyPressRoutes");
 app.use("/api", keyPressRouter);
+
 const batteryStatusRouter = require("./routes/batteryStatusRoutes");
 app.use("/api", batteryStatusRouter);
 
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);  // Make sure the route prefix matches
-
+const authRouter = require("./routes/authRoute");
+app.use("/api/auth", authRouter);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
