@@ -26,6 +26,13 @@ app.use("/api", batteryStatusRouter);
 const authRouter = require("./routes/authRoute");
 app.use("/api/auth", authRouter);
 
+// menu routes
+const menuRoutes = require("./routes/menuItemsFetchRoutes");
+app.use("/api", menuRoutes);
+
+const orderRoutes = require("./routes/orderSubmitRoutes");
+app.use("/api", orderRoutes);
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
