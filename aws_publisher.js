@@ -5,10 +5,10 @@ const awsIot = require("aws-iot-device-sdk");
 const device = awsIot.device({
   // Path to your private key
   keyPath:
-    "./cert/d963cd1faf2a812ee9a50f1257971e394cdb03d34b49e6f9d787e81fdd2630fa-private.pem.key",
+    "./cert/567ac5f9b0348408455bfc91506042fe17270e042a0499705711a24c5c7a6883-private.pem.key",
   // Path to your certificate
   certPath:
-    "./cert/d963cd1faf2a812ee9a50f1257971e394cdb03d34b49e6f9d787e81fdd2630fa-certificate.pem.crt",
+    "./cert/567ac5f9b0348408455bfc91506042fe17270e042a0499705711a24c5c7a6883-certificate.pem.crt",
   caPath: "./cert/AmazonRootCA1.pem", // Root CA
   clientId: `myNodeClient-${Date.now()}`, // Unique client ID
   host: "a2cdp9hijgdiig-ats.iot.ap-southeast-2.amazonaws.com", // AWS IoT endpoint
