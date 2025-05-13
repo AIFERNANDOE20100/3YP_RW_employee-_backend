@@ -1,4 +1,6 @@
 const admin = require("firebase-admin");
+const AWS = require("aws-sdk");
+// const awsIot = require("aws-iot-device-sdk"); /////////////////// Uncomment if wanna test AWS IoT/////////////////
 const authService = require("../servicers/authServicer");
 
 const db = admin.firestore();
@@ -41,7 +43,60 @@ const login = async (req, res) => {
       password
     );
 
-    // Optional: Fetch additional user data
+    // Configure AWS region and temporary credentials from Cognito Identity Pool
+    AWS.config.region = process.env.AWS_REGION;
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: process.env.AWS_IDENTITY_POOL_ID,
+      Logins: {
+        [`securetoken.google.com/${process.env.FIREBASE_PROJECT_ID}`]: idToken,
+      },
+    });
+
+    console.log("AWS credentials configured");
+
+    // Fetch AWS temporary credentials
+    await new Promise((resolve, reject) => {
+      AWS.config.credentials.get(function (err) {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    const identityId = AWS.config.credentials.identityId;
+    console.log("Fetched AWS Identity ID:", identityId);
+
+    // === Step: Ensure IoT policy is attached to this Identity ID ===
+    const iot = new AWS.Iot();
+
+    const policyName = process.env.AWS_IOT_POLICY_NAME;
+
+    try {
+      const attached = await iot
+        .listAttachedPolicies({ target: identityId })
+        .promise();
+
+      const alreadyAttached = attached.policies.some(
+        (policy) => policy.policyName === policyName
+      );
+
+      if (!alreadyAttached) {
+        console.log(`Policy not attached, attaching policy: ${policyName}`);
+        await iot
+          .attachPolicy({
+            policyName: policyName,
+            target: identityId,
+          })
+          .promise();
+        console.log("IoT policy attached successfully");
+      } else {
+        console.log("IoT policy already attached");
+      }
+    } catch (err) {
+      console.error("Error checking/attaching IoT policy:", err);
+      return res.status(500).json({ error: "Failed to ensure IoT permissions" });
+    }
+
+    // === Step: Fetch Firestore data for user ===
     const snapshot = await db
       .collection("employees")
       .where("email", "==", email)
@@ -52,6 +107,45 @@ const login = async (req, res) => {
       restaurantId = snapshot.docs[0].data().restaurantId || null;
     }
 
+    /////////////////// Uncomment if wanna test AWS IoT/////////////////
+    // console.log("User data fetched from Firestore:", {
+    //   email,
+    //   restaurantId,
+    // });
+
+    // // === Step: Connect to AWS IoT via MQTT using temporary credentials ===
+    // const device = awsIot.device({
+    //   region: process.env.AWS_REGION,
+    //   protocol: "wss",
+    //   accessKeyId: AWS.config.credentials.accessKeyId,
+    //   secretKey: AWS.config.credentials.secretAccessKey,
+    //   sessionToken: AWS.config.credentials.sessionToken,
+    //   host: process.env.AWS_IOT_ENDPOINT,
+    // });
+
+    // console.log("Connecting to AWS IoT via MQTT...");
+
+    // device.on("connect", function () {
+    //   console.log("Connected to AWS IoT via MQTT!");
+    //   device.publish(
+    //     "test/topic",
+    //     JSON.stringify({
+    //       message: `User ${email} logged in`,
+    //       timestamp: new Date().toISOString(),
+    //     }),
+    //     (err) => {
+    //       if (err) {
+    //         console.error("Publish error:", err);
+    //       } else {
+    //         console.log("Message published to test/topic");
+    //       }
+    //     }
+    //   );
+    // });
+    /////////////////// Uncomment if wanna test AWS IoT/////////////////
+
+    console.log("Returning response to client");
+
     return res.status(200).json({
       message: "Login successful",
       user: {
@@ -59,6 +153,12 @@ const login = async (req, res) => {
         email,
         token: idToken,
         restaurantId,
+        awsAccessKey: AWS.config.credentials.accessKeyId,
+        awsSecretKey: AWS.config.credentials.secretAccessKey,
+        awsSessionToken: AWS.config.credentials.sessionToken,
+        awsRegion: process.env.AWS_REGION,
+        awsHost: process.env.AWS_IOT_ENDPOINT,
+        topic: "test/topic", // make a dynamic topic here , with resturent i and robot/user id  to make sure the topic is unique
       },
     });
   } catch (error) {
