@@ -7,7 +7,7 @@ const db = admin.firestore();
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Signup request received");
+  //console.log("Signup request received");
 
   try {
     // Check if the user already exists by email
@@ -22,12 +22,12 @@ const signup = async (req, res) => {
         const user = await authService.createUser(email, password);
         return res.status(200).json({ message: "Signup successful", user });
       } catch (createError) {
-        console.error("Error creating new user:", createError);
+        //console.error("Error creating new user:", createError);
         return res.status(500).json({ error: "Failed to create user" });
       }
     } else {
       // If it's some other error, handle it
-      console.error("Error during signup:", error);
+      //console.error("Error during signup:", error);
       return res.status(500).json({ error: "An unexpected error occurred" });
     }
   }
@@ -35,7 +35,7 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Login request received");
+  //console.log("Login request received");
 
   try {
     const { idToken, localId } = await authService.signInWithEmailAndPassword(
@@ -52,7 +52,7 @@ const login = async (req, res) => {
       },
     });
 
-    console.log("AWS credentials configured");
+    //console.log("AWS credentials configured");
 
     // Fetch AWS temporary credentials
     await new Promise((resolve, reject) => {
@@ -63,7 +63,7 @@ const login = async (req, res) => {
     });
 
     const identityId = AWS.config.credentials.identityId;
-    console.log("Fetched AWS Identity ID:", identityId);
+    //console.log("Fetched AWS Identity ID:", identityId);
 
     // === Step: Ensure IoT policy is attached to this Identity ID ===
     const iot = new AWS.Iot();
@@ -80,19 +80,19 @@ const login = async (req, res) => {
       );
 
       if (!alreadyAttached) {
-        console.log(`Policy not attached, attaching policy: ${policyName}`);
+        //console.log(`Policy not attached, attaching policy: ${policyName}`);
         await iot
           .attachPolicy({
             policyName: policyName,
             target: identityId,
           })
           .promise();
-        console.log("IoT policy attached successfully");
+        //console.log("IoT policy attached successfully");
       } else {
-        console.log("IoT policy already attached");
+        //console.log("IoT policy already attached");
       }
     } catch (err) {
-      console.error("Error checking/attaching IoT policy:", err);
+      //console.error("Error checking/attaching IoT policy:", err);
       return res.status(500).json({ error: "Failed to ensure IoT permissions" });
     }
 
@@ -144,7 +144,7 @@ const login = async (req, res) => {
     // });
     /////////////////// Uncomment if wanna test AWS IoT/////////////////
 
-    console.log("Returning response to client");
+    //console.log("Returning response to client");
 
     return res.status(200).json({
       message: "Login successful",
@@ -162,7 +162,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error.response?.data || error.message);
+    //console.error("Login error:", error.response?.data || error.message);
     return res.status(401).json({ error: "Invalid email or password" });
   }
 };
