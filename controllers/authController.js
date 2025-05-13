@@ -158,7 +158,7 @@ const login = async (req, res) => {
         awsSessionToken: AWS.config.credentials.sessionToken,
         awsRegion: process.env.AWS_REGION,
         awsHost: process.env.AWS_IOT_ENDPOINT,
-        topic: "test/topic", // make a dynamic topic here , with resturent i and robot/user id  to make sure the topic is unique
+        topic: `robot/${identityId}/control`, // dynamically include idToken in the topic string
       },
     });
   } catch (error) {
