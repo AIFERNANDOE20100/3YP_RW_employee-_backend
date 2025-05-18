@@ -52,7 +52,7 @@ const login = async (req, res) => {
       },
     });
 
-    //console.log("AWS credentials configured");
+    console.log("AWS credentials configured");
 
     // Fetch AWS temporary credentials
     await new Promise((resolve, reject) => {
@@ -63,7 +63,7 @@ const login = async (req, res) => {
     });
 
     const identityId = AWS.config.credentials.identityId;
-    //console.log("Fetched AWS Identity ID:", identityId);
+    console.log("Fetched AWS Identity ID:", identityId);
 
     // === Step: Ensure IoT policy is attached to this Identity ID ===
     const iot = new AWS.Iot();
@@ -74,25 +74,25 @@ const login = async (req, res) => {
       const attached = await iot
         .listAttachedPolicies({ target: identityId })
         .promise();
-
+      console.log("Attached policies checked");
       const alreadyAttached = attached.policies.some(
         (policy) => policy.policyName === policyName
       );
 
       if (!alreadyAttached) {
-        //console.log(`Policy not attached, attaching policy: ${policyName}`);
+        console.log(`Policy not attached, attaching policy: ${policyName}`);
         await iot
           .attachPolicy({
             policyName: policyName,
             target: identityId,
           })
           .promise();
-        //console.log("IoT policy attached successfully");
+        console.log("IoT policy attached successfully");
       } else {
-        //console.log("IoT policy already attached");
+        console.log("IoT policy already attached");
       }
     } catch (err) {
-      //console.error("Error checking/attaching IoT policy:", err);
+      console.error("Error checking/attaching IoT policy:", err);
       return res.status(500).json({ error: "Failed to ensure IoT permissions" });
     }
 
@@ -144,7 +144,7 @@ const login = async (req, res) => {
     // });
     /////////////////// Uncomment if wanna test AWS IoT/////////////////
 
-    //console.log("Returning response to client");
+    console.log(`robot/${identityId}/control`);
 
     return res.status(200).json({
       message: "Login successful",
@@ -162,7 +162,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    //console.error("Login error:", error.response?.data || error.message);
+    console.error("Login error:", error.response?.data || error.message);
     return res.status(401).json({ error: "Invalid email or password" });
   }
 };

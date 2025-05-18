@@ -39,7 +39,7 @@ const orderRoutes = require("./routes/orderSubmitRoutes");
 app.use("/api", orderRoutes);
 
 // 🧩 Add WebSocket Proxy Route for Video Stream
-const RASPBERRY_PI_WS_URL = "ws://192.168.8.139:8765"; // Change to your Pi's IP and port
+const RASPBERRY_PI_WS_URL = "ws://192.168.180.85:8765"; // Change to your Pi's IP and port
 
 app.ws("/video-stream", (clientSocket, req) => {
   console.log("[*] Client connected to video stream");
