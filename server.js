@@ -32,6 +32,9 @@ app.use("/api", menuRoutes);
 const orderRoutes = require("./routes/orderRoutes");
 app.use("/api", orderRoutes);
 
+const robotRoutes = require("./routes/robotRoute");
+app.use("/api", robotRoutes);
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
