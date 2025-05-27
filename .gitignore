@@ -2,3 +2,4 @@ cert/
 firebaseServiceAccount.json
 .env
 node_modules/
+node_modules
