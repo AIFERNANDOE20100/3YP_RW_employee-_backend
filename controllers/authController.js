@@ -144,7 +144,12 @@ const login = async (req, res) => {
     // });
     /////////////////// Uncomment if wanna test AWS IoT/////////////////
 
-    console.log(`robot/${identityId}/control`);
+    // console.log(`robot/${identityId}/control`);
+    // // print all AWS.config credentials
+    // console.log("AWS Credentials:");
+    // console.log(`Access Key ID: ${AWS.config.credentials.accessKeyId}`);
+    // console.log(`Secret Access Key: ${AWS.config.credentials.secretAccessKey}`);
+    // console.log(`Session Token: ${AWS.config.credentials.sessionToken}`);
 
     return res.status(200).json({
       message: "Login successful",
