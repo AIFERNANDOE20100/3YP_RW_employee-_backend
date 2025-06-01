@@ -7,7 +7,7 @@ const db = admin.firestore();
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Signup request received");
+  //console.log("Signup request received");
 
   try {
     // Check if the user already exists by email
@@ -22,12 +22,12 @@ const signup = async (req, res) => {
         const user = await authService.createUser(email, password);
         return res.status(200).json({ message: "Signup successful", user });
       } catch (createError) {
-        console.error("Error creating new user:", createError);
+        //console.error("Error creating new user:", createError);
         return res.status(500).json({ error: "Failed to create user" });
       }
     } else {
       // If it's some other error, handle it
-      console.error("Error during signup:", error);
+      //console.error("Error during signup:", error);
       return res.status(500).json({ error: "An unexpected error occurred" });
     }
   }
@@ -35,7 +35,7 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("Login request received");
+  //console.log("Login request received");
 
   try {
     const { idToken, localId } = await authService.signInWithEmailAndPassword(
@@ -74,7 +74,7 @@ const login = async (req, res) => {
       const attached = await iot
         .listAttachedPolicies({ target: identityId })
         .promise();
-
+      console.log("Attached policies checked");
       const alreadyAttached = attached.policies.some(
         (policy) => policy.policyName === policyName
       );
@@ -144,7 +144,12 @@ const login = async (req, res) => {
     // });
     /////////////////// Uncomment if wanna test AWS IoT/////////////////
 
-    console.log("Returning response to client");
+    // console.log(`robot/${identityId}/control`);
+    // // print all AWS.config credentials
+    // console.log("AWS Credentials:");
+    // console.log(`Access Key ID: ${AWS.config.credentials.accessKeyId}`);
+    // console.log(`Secret Access Key: ${AWS.config.credentials.secretAccessKey}`);
+    // console.log(`Session Token: ${AWS.config.credentials.sessionToken}`);
 
     return res.status(200).json({
       message: "Login successful",
