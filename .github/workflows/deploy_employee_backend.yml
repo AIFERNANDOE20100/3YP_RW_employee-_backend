@@ -1,0 +1,24 @@
+name: Deploy Employee Backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH key
+      run: |
+        echo "${{ secrets.EMPLOYEE_BACKEND_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Rsync code to EC2
+      run: |
+        rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env' \
+        -e "ssh -o StrictHostKeyChecking=no -i key.pem" ./ \
+        ubuntu@ec2-16-176-179-124.ap-southeast-2.compute.amazonaws.com:~/3YP_RW_employee_backend
