@@ -5,6 +5,18 @@ const db = admin.firestore();
 // Get all robots for a given restaurant
 exports.getRestaurantRobots = async (req, res) => {
   const { restaurantId } = req.params;
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!idToken) {
+    return res.status(401).json({ message: "Missing or invalid authentication token" });
+  }
+
+  try {
+    // Verify the authentication token
+    await admin.auth().verifyIdToken(idToken);
+  } catch (authError) {
+    return res.status(401).json({ message: "Invalid or expired authentication token" });
+  }
 
   if (!restaurantId) {
     return res.status(400).json({ message: "Restaurant ID is required" });
