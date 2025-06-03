@@ -173,33 +173,20 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing or invalid token" });
-  }
-
-  const idToken = authHeader.split(" ")[1];
+  const { uid } = req.body;
 
   try {
-    // Verify the ID token and get user UID
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const uid = decodedToken.uid;
-
-    // Revoke all refresh tokens for this user
     await admin.auth().revokeRefreshTokens(uid);
-
-    console.log(`Refresh tokens revoked for user ${uid}`);
-    return res.status(200).json({ message: "User signed out successfully" });
+    console.log(`Revoked tokens for user: ${uid}`);
+    return res.status(200).json({ message: "Logout successful and token revoked" });
   } catch (error) {
-    console.error("Error revoking tokens:", error.message);
-    return res.status(500).json({ error: "Failed to sign out user" });
+    console.error("Error revoking tokens:", error);
+    return res.status(500).json({ error: "Failed to revoke tokens" });
   }
 };
-
 
 module.exports = {
   signup,
   login,
-  logout
+  logout,
 };
