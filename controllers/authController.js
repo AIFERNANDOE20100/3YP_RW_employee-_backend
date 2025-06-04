@@ -5,6 +5,32 @@ const authService = require("../servicers/authServicer");
 
 const db = admin.firestore();
 
+const sendPasswordResetEmail = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    // Generate password reset link via Firebase Admin SDK
+    const link = await admin.auth().generatePasswordResetLink(email);
+
+    // Here, you can send the email yourself using your preferred email service,
+    // or just return the link to the frontend for client-side email sending.
+    // For now, let's just return the link (or you can implement Nodemailer, etc.)
+
+    // Example: send via Nodemailer (optional)
+    // await sendResetEmail(email, link);
+
+    return res.status(200).json({ message: "Password reset link generated", resetLink: link });
+  } catch (error) {
+    console.error("Error generating password reset link:", error);
+    return res.status(500).json({ error: "Failed to generate password reset email" });
+  }
+};
+
+
 const signup = async (req, res) => {
   const { email, password } = req.body;
   //console.log("Signup request received");
@@ -189,4 +215,5 @@ module.exports = {
   signup,
   login,
   logout,
+  sendPasswordResetEmail,
 };
