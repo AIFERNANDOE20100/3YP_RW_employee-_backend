@@ -22,3 +22,16 @@ jobs:
         rsync -avz --exclude 'node_modules' --exclude '.git' --exclude '.env' \
         -e "ssh -o StrictHostKeyChecking=no -i key.pem" ./ \
         ubuntu@ec2-16-176-179-124.ap-southeast-2.compute.amazonaws.com:~/3YP_RW_employee_backend
+
+    - name: Restart employee_backend with PM2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-16-176-179-124.ap-southeast-2.compute.amazonaws.com << 'EOF'
+          cd ~/3YP_RW_employee_backend
+          if pm2 list | grep -q employee_backend; then
+            echo "employee_backend is running. Restarting..."
+            pm2 stop employee_backend
+          else
+            echo "employee_backend is not running. Starting fresh..."
+          fi
+          pm2 start employee_backend
+        EOF
