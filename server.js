@@ -40,6 +40,11 @@ app.use("/api", orderRoutes);
 const robotRoutes = require("./routes/robotRoute");
 app.use("/api", robotRoutes);
 
+// Health check
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
 // 🧩 Add WebSocket Proxy Route for Video Stream
 const RASPBERRY_PI_WS_URL = "ws://192.168.180.85:8765"; // Change to your Pi's IP and port
 
