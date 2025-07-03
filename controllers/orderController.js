@@ -1,6 +1,5 @@
 const admin = require("firebase-admin");
 const authService = require("../servicers/authServicer");
-
 const db = admin.firestore();
 let orderCounter = 0;
 
@@ -18,6 +17,8 @@ async function getNextOrderNumber() {
 }
 
 exports.submitOrder = async (req, res) => {
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
+  // console.log("ID Token:", idToken);
   try {
     console.log("Order submission request received");
     const { tableNo, restaurantId, userId, items, totalQuantity, robotId } = req.body;
@@ -31,6 +32,17 @@ exports.submitOrder = async (req, res) => {
       !robotId
     ) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (!idToken) {
+      return res.status(401).json({ message: "Missing or invalid authentication token" });
+    }
+
+    // Verify the authentication token
+    try {
+      await admin.auth().verifyIdToken(idToken);
+    } catch (authError) {
+      return res.status(401).json({ message: "Invalid or expired authentication token" });
     }
 
     const orderNumber = await getNextOrderNumber();
@@ -60,6 +72,18 @@ exports.getOrders = async (req, res) => {
 
   if (!restaurantId || !robotId) {
     return res.status(400).json({ error: "Missing restaurantId or robotId" });
+  }
+
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
+  if (!idToken) {
+    return res.status(401).json({ error: "Missing or invalid authentication token" });
+  }
+
+  // Verify the authentication token
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch (authError) {
+    return res.status(401).json({ error: "Invalid or expired authentication token" });
   }
 
   try {
@@ -94,6 +118,18 @@ exports.markOrderCompleted = async (req, res) => {
 
   if (!orderId) {
     return res.status(400).json({ error: "Missing orderId" });
+  }
+
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
+  if (!idToken) {
+    return res.status(401).json({ error: "Missing or invalid authentication token" });
+  }
+
+  // Verify the authentication token
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch (authError) {
+    return res.status(401).json({ error: "Invalid or expired authentication token" });
   }
 
   try {

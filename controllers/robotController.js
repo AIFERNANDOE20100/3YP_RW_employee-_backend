@@ -43,6 +43,17 @@ exports.robotConnection = async (req, res) => {
     return res.status(400).json({ message: "Robot ID and Restaurant ID are required" });
   }
 
+  if (!idToken) {
+    return res.status(401).json({ message: "Missing or invalid authentication token" });
+  }
+
+  // Verify the authentication token
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch (authError) {
+    return res.status(401).json({ message: "Invalid or expired authentication token" });
+  }
+
   try {
     // Fetch the robot document
     const robotDoc = await db.collection("robots").doc(robotId).get();
