@@ -3,10 +3,10 @@ const awsIot = require("aws-iot-device-sdk");
 // AWS IoT Device Configuration
 const device = awsIot.device({
   keyPath:
-    "./cert_exhibit/1c0e76c62d58f716b82ae99a257860aa55b29e4aea5470b92c3eefcea8daae3b-private.pem.key",
+    "./cert/1c0e76c62d58f716b82ae99a257860aa55b29e4aea5470b92c3eefcea8daae3b-private.pem.key",
   certPath:
-    "./cert_exhibit/1c0e76c62d58f716b82ae99a257860aa55b29e4aea5470b92c3eefcea8daae3b-certificate.pem.crt",
-  caPath: "./cert_exhibit/AmazonRootCA1.pem",
+    "./cert/1c0e76c62d58f716b82ae99a257860aa55b29e4aea5470b92c3eefcea8daae3b-certificate.pem.crt",
+  caPath: "./cert/AmazonRootCA1.pem",
   clientId: `myNodeSubscriber-${Date.now()}`,
   host: "a2xhp106oe6s98-ats.iot.ap-southeast-2.amazonaws.com",
 });

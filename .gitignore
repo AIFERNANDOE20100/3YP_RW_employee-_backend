@@ -1,5 +1,4 @@
 cert/
-cert_exhibit/
 firebaseServiceAccount.json
 .env
 node_modules/
